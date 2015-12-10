@@ -1,2 +1,2 @@
 # semanticsVsualization
-[webpage] (https://github.tamu.edu/pages/bote795/semanticsVsualization)
+[webpage] (http://bote795.github.io/semanticsVisualization)
