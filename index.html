@@ -5,10 +5,33 @@
 text {
   font: 10px sans-serif;
 }
+.domain {
+  fill: none;
+  stroke: #000;
+  stroke-opacity: .3;
+  stroke-width: 10px;
+  stroke-linecap: round;
+}
+.tick {
+  font-size: 10px;
+}
+.selecting circle {
+  fill-opacity: .2;
+}
 
+.selecting circle.selected {
+  stroke: #f00;
+}
+.handle {
+  fill: #fff;
+  stroke: #000;
+  stroke-opacity: .5;
+  stroke-width: 1.25px;
+  cursor: crosshair;
+}
 </style>
 <body>
-    <script src="//d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
 
 var diameter = 960,
@@ -19,17 +42,56 @@ var bubble = d3.layout.pack()
     .sort(null)
     .size([diameter, diameter])
     .padding(1.5);
+    //data values being used
+var xScale = d3.scale.linear()
+    .domain([1, 100]) //phyiscal inputed values
+    .range([1,900]) //outputed numbers
+    .clamp(true)
+    //physical axis
+var xAxis = d3.svg.axis()
+    .scale(xScale)
+    .tickSize(0)
+    .tickPadding(15)
+
+    function brushed () {
+      // body...
+    }
+var brush = d3.svg.brush()
+    .x(xScale)
+    .extent([0, 100])
+    .on("brush", brushed)
 
 var svg = d3.select("body").append("svg")
     .attr("width", diameter)
     .attr("height", diameter)
     .attr("class", "bubble");
 
+//slider
+var slidercontainer = svg.append("g")
+  .attr("transform", "translate(10, 10)")
+var axis = slidercontainer.append("g")
+  .call(xAxis)
+var slider = slidercontainer.append("g")
+  .call(brush)
+  .classed("slider", true)
+slider.selectAll(".extent,.resize")
+    .remove();
+//circle manipulaters
+  slider.append("circle")
+    .attr("r", 10)
+    .attr("fill", "Red")
+    .classed("handle", true)
+    .attr("transform", "translate(0,0)")
+
+  d3.select(".domain")
+    .select(function() {return this.parentNode.appendChild(this.cloneNode(true))})
+    .classed("halo", true)
+slider
+    .call(brush.extent([0, 100]))
+
 d3.json("FullData", function(error, root) {
   if (error) throw error;
-function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+  
   var node = svg.selectAll(".node")
       .data(bubble.nodes(classes(root))
       .filter(function(d) { return !d.children; }))
@@ -39,31 +101,19 @@ function getRandomInt(min, max) {
 
   node.append("title")
       .text(function(d) { return d.className + ": " + format(d.value); });
-/*node.append("pattern")
-  .attr('id', function(d) { return (d.className.replace(/ /g,'')+"-icon");}) // just create a unique id (id comes from the json)
-  .attr('width', 1)
-  .attr('height', 1)
-  .attr('patternContentUnits', 'objectBoundingBox')
-  .append("svg:image")
-    .attr("xlink:xlink:href", function(d) { return (d.url);}) //The double xlink:xlink is a necessary hack (first "xlink:" is lost...).
-    .attr("x", 0)
-    .attr("y", 0)
-    .attr("height", 1)
-    .attr("width", 1)
-    .attr("preserveAspectRatio", "xMinYMin slice");*/
- 
+
   node.append("circle")
-      .attr("r", function(d) { return d.r; })
-      //.style("stroke", "black")     
+    .attr("r", function(d) { return d.r; })
     .style("fill", function(d) { return color(getRandomInt(0,20)); })
-   // .style("fill", function(d) { return ("url(#"+d.className.replace(/ /g,'')+"-icon)");})
 
 
   node.append("text")
       .attr("dy", ".3em")
       .style("text-anchor", "middle")
       .text(function(d) { return d.className.substring(0, d.r / 3); });
+
 });
+
 
 // Returns a flattened hierarchy containing all leaf nodes under the root.
 function classes(root) {
@@ -77,7 +127,9 @@ function classes(root) {
   recurse(null, root);
   return {children: classes};
 }
-
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 d3.select(self.frameElement).style("height", diameter + "px");
 
 </script>
