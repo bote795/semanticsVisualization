@@ -39,8 +39,33 @@ circle {
   fill-opacity: .125;
   shape-rendering: crispEdges;
 }
-
-
+svg:nth-of-type(2) {
+  float: right;
+  position: absolute;
+}
+.domain {
+  fill: none;
+  stroke: #000;
+  stroke-opacity: .3;
+  stroke-width: 10px;
+  stroke-linecap: round;
+}
+.tick {
+  font-size: 10px;
+}
+.selecting circle {
+  fill-opacity: .2;
+}
+.selecting circle.selected {
+  stroke: #f00;
+}
+.handle {
+  fill: #fff;
+  stroke: #000;
+  stroke-opacity: .5;
+  stroke-width: 1.25px;
+  cursor: crosshair;
+}
 /*
 .axis text {
   font: 11px sans-serif;
@@ -85,6 +110,9 @@ circle {
 var minFreq = 5000;
 var maxFreq = Math.pow(10, 5);
 
+var maxSize = 1570;
+var elementSize = maxSize;
+
 var diameter = 960,
         format = d3.format(",d"),
         color = d3.scale.category20();
@@ -122,50 +150,52 @@ function update() {
     
     svg1.selectAll("*").remove();
 
-
-    d3.json("FullData", function(error, root) {
-        if (error) throw error;
+    d3.json("FullDataTags", function(error, root) {
+          if (error) throw error;
         function getRandomInt(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
+    var elements = classes(root);
+    if (elementSize != maxSize) 
+    {
+      elements.children = elements.children.splice(0,elementSize);
+    }
+    var laidOut = bubble.nodes(elements);
 
-        var laidOut = bubble.nodes(classes(root));
+    var node = svg1.selectAll(".node")
+        .data(laidOut
+        .filter(function(d) { return !d.children && d.value <= maxFreq && minFreq <= d.value; }))
+        //.filter(function(d) { return d.value <= maxFreq && minFreq <= d.value; }))
+        .enter().append("g")
+        .attr("class", "node")
+        .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
-        var node = svg1.selectAll(".node")
-            .data(laidOut
-            .filter(function(d) { return !d.children && d.value <= maxFreq && minFreq <= d.value; }))
-            //.filter(function(d) { return d.value <= maxFreq && minFreq <= d.value; }))
-            .enter().append("g")
-            .attr("class", "node")
-            .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
-
-        node.append("title")
-            .text(function(d) { return d.className + ": " + format(d.value); });
-      /*node.append("pattern")
-        .attr('id', function(d) { return (d.className.replace(/ /g,'')+"-icon");}) // just create a unique id (id comes from the json)
-        .attr('width', 1)
-        .attr('height', 1)
-        .attr('patternContentUnits', 'objectBoundingBox')
-        .append("svg:image")
-          .attr("xlink:xlink:href", function(d) { return (d.url);}) //The double xlink:xlink is a necessary hack (first "xlink:" is lost...).
-          .attr("x", 0)
-          .attr("y", 0)
-          .attr("height", 1)
-          .attr("width", 1)
-          .attr("preserveAspectRatio", "xMinYMin slice");*/
-
-       
-          node.append("circle")
-            .attr("r", function(d) { return d.r; })
-              //.style("stroke", "black")     
-            .style("fill", function(d) { return color(getRandomInt(0,20)); })
-           // .style("fill", function(d) { return ("url(#"+d.className.replace(/ /g,'')+"-icon)");})
+    node.append("title")
+        .text(function(d) { return d.className + ": " + format(d.value); });
+  /*node.append("pattern")
+    .attr('id', function(d) { return (d.className.replace(/ /g,'')+"-icon");}) // just create a unique id (id comes from the json)
+    .attr('width', 1)
+    .attr('height', 1)
+    .attr('patternContentUnits', 'objectBoundingBox')
+    .append("svg:image")
+      .attr("xlink:xlink:href", function(d) { return (d.url);}) //The double xlink:xlink is a necessary hack (first "xlink:" is lost...).
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("height", 1)
+      .attr("width", 1)
+      .attr("preserveAspectRatio", "xMinYMin slice");*/
+   
+      node.append("circle")
+          .attr("r", function(d) { return d.r; })
+          //.style("stroke", "black")     
+        .style("fill", function(d) { return color(getRandomInt(0,20)); })
+       // .style("fill", function(d) { return ("url(#"+d.className.replace(/ /g,'')+"-icon)");})
 
 
-          node.append("text")
-              .attr("dy", ".3em")
-              .style("text-anchor", "middle")
-              .text(function(d) { return d.className.substring(0, d.r / 3); });
+      node.append("text")
+          .attr("dy", ".3em")
+          .style("text-anchor", "middle")
+          .text(function(d) { return d.className.substring(0, d.r / 3); });
     });
 
     // Returns a flattened hierarchy containing all leaf nodes under the root.
@@ -174,7 +204,10 @@ function update() {
 
       function recurse(name, node) {
         if (node.children) node.children.forEach(function(child) { recurse(node.name, child); });
-        else classes.push({packageName: name, className: node.name, value: node.size, url: node.url});
+        else classes.push({packageName: name, className: node.name, value: node.size, url: node.url, 
+        HourOfDay:{"freq": node.HourOfDay.freq, "time": node.HourOfDay["time"]}, 
+        device: {"name": node.device["name"], "num": node.device.num},
+        season: {"name": node.season["name"], "freq": node.season.freq}});
       }
 
       recurse(null, root);
@@ -247,7 +280,64 @@ function brushend() {
   svg.classed("selecting", !d3.event.target.empty());
   update();
 }
+//second filter percentage
+var xScale = d3.scale.linear()
+    .domain([1, 100]) //phyiscal inputed values
+    .range([1,900]) //outputed numbers
+    .clamp(true)
+var xAxis = d3.svg.axis()
+    .scale(xScale)
+    .tickSize(0)
+    .tickPadding(15)
+var slidercontainer = svg.append("g")
+  .attr("transform", "translate(0, 10)")
 
+var axis = slidercontainer.append("g")
+  .call(xAxis) 
+var brushPercentage = d3.svg.brush()
+      .x(xScale)
+      .extent([0, 100])
+      .on("brush", brushedUpdateNum)
+      .on("brushend", brushedUpdate)
+  var slider = slidercontainer.append("g")
+    .call(brushPercentage)
+    .classed("slider", true)
+  slider.selectAll(".extent,.resize")
+      .remove();
+  //circle manipulaters
+  var handle=  slider.append("circle")
+      .attr("r", 10)
+      .attr("fill", "Red")
+      .classed("handle", true)
+      .attr("transform", "translate(0,0)")
+    d3.select(".domain")
+      .select(function() {return this.parentNode.appendChild(this.cloneNode(true))})
+      .classed("halo", true)
+  slider
+      .call(brushPercentage.event)
+    .transition() // gratuitous intro!
+      .duration(750)
+      .call(brushPercentage.extent([0, 100]))
+      .call(brushPercentage.event); 
+   function brushedUpdateNum () {
+    var value = brush.extent()[0];
+    if (d3.event.sourceEvent) { // not a programmatic event
+      value = xScale.invert(d3.mouse(this)[0]);
+      elementSize = (value.toFixed(0)/100*maxSize).toFixed(0);
+      brush.extent([value, value]);
+    }
+    handle.attr("cx", xScale(value));
+  }         
+  function brushedUpdate () {
+    var value = brush.extent()[0];
+    if (d3.event.sourceEvent) { // not a programmatic event
+      value = xScale.invert(d3.mouse(this)[0]);
+      elementSize = (value.toFixed(0)/100*maxSize).toFixed(0);
+      brush.extent([value, value]);
+      update();
+    }
+    handle.attr("cx", xScale(value));
+  }        
  //date slider
 /*
 d3.select(self.frameElement).style("height", diameter + "px");
