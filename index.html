@@ -288,52 +288,51 @@ function brushend() {
   update();
 }
 
-/*
  //date slider
 
 d3.select(self.frameElement).style("height", diameter + "px");
 
-var margin = {top: 200, right: 40, bottom: 200, left: 40},
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+var timeMargin = {top: 200, right: 40, bottom: 200, left: 40},
+    timeWidth = 960 - timeMargin.left - timeMargin.right,
+    timeHeight = 500 - timeMargin.top - timeMargin.bottom;
 
-var x = d3.time.scale(d3.time.hour, 1)
+var timeX = d3.time.scale(d3.time.hour, 1)
     .domain([new Date(2013, 2, 1), new Date(2013, 2, 15) - 1])
-    .range([0, width]);
+    .range([0, timeWidth]);
 
 var timeBrush = d3.svg.brush()
-    .x(x)
+    .x(timeX)
     .extent([new Date(2013, 2, 2), new Date(2013, 2, 3)])
     .on("brush", timeBrushed);
 
-var svg = d3.select("body").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
+var svg2 = d3.select("body").append("svg")
+    .attr("width", timeWidth + timeMargin.left + timeMargin.right)
+    .attr("height", timeHeight + timeMargin.top + timeMargin.bottom)
   .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + timeMargin.left + "," + timeMargin.top + ")");
 
-svg.append("rect")
+svg2.append("rect")
     .attr("class", "grid-background")
-    .attr("width", width)
-    .attr("height", height);
+    .attr("width", timeWidth)
+    .attr("height", timeHeight);
 
-svg.append("g")
+svg2.append("g")
     .attr("class", "x grid")
-    .attr("transform", "translate(0," + height + ")")
+    .attr("transform", "translate(0," + timeHeight + ")")
     .call(d3.svg.axis()
-        .scale(x)
+        .scale(timeX)
         .orient("bottom")
         .ticks(d3.time.hours, 12)
-        .tickSize(-height)
+        .tickSize(-timeHeight)
         .tickFormat(""))
   .selectAll(".tick")
     .classed("minor", function(d) { return d.getHours(); });
 
-svg.append("g")
+svg2.append("g")
     .attr("class", "x axis")
-    .attr("transform", "translate(0," + height + ")")
+    .attr("transform", "translate(0," + timeHeight + ")")
     .call(d3.svg.axis()
-      .scale(x)
+      .scale(timeX)
       .orient("bottom")
       .ticks(d3.time.days)
       .tickPadding(0))
@@ -341,12 +340,12 @@ svg.append("g")
     .attr("x", 6)
     .style("text-anchor", null);
 
-var gBrush = svg.append("g")
+var gBrush = svg2.append("g")
     .attr("class", "brush")
     .call(brush);
 
 gBrush.selectAll("rect")
-    .attr("height", height);
+    .attr("height", timeHeight);
 
 function timeBrushed() {
   var extent0 = brush.extent(),
@@ -372,8 +371,5 @@ function timeBrushed() {
 
   d3.select(this).call(brush.extent(extent1));
 }
-
-*/
-
 
 </script>
