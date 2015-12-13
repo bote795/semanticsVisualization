@@ -66,14 +66,12 @@ svg:nth-of-type(2) {
   stroke-width: 1.25px;
   cursor: crosshair;
 }
-/*
+
+
 .axis text {
   font: 11px sans-serif;
 }
 
-.axis path {
-  display: none;
-}
 
 .axis line {
   fill: none;
@@ -101,7 +99,7 @@ svg:nth-of-type(2) {
   fill-opacity: .125;
   shape-rendering: crispEdges;
 }
-*/
+
 </style>
 <body>
     <script src="https://d3js.org/d3.v3.min.js"></script>
@@ -109,6 +107,9 @@ svg:nth-of-type(2) {
 
 var minFreq = 5000;
 var maxFreq = Math.pow(10, 5);
+
+var minTime = 0;
+var maxTime = 24;
 
 var maxSize = 1570;
 var PicThreshold = 80;
@@ -160,9 +161,15 @@ function update() {
     var counter=0;
     var node = svg1.selectAll(".node")
         .data(laidOut
-        .filter(function(d) { 
-          if(!d.children && d.value <= maxFreq && minFreq <= d.value) counter++;
-          return !d.children && d.value <= maxFreq && minFreq <= d.value; }))
+          .filter(function(d) { //console.log(d); 
+            if(!d.children && d.value <= maxFreq && minFreq <= d.value && d.HourOfDay.time >= minTime 
+                && d.HourOfDay.time < maxTime) counter++;
+              return !d.children 
+                && d.value <= maxFreq 
+                && minFreq <= d.value 
+                && d.HourOfDay.time >= minTime 
+                && d.HourOfDay.time < maxTime; 
+            }))
         //.filter(function(d) { return d.value <= maxFreq && minFreq <= d.value; }))
         .enter().append("g")
         .attr("class", "node")
@@ -224,6 +231,7 @@ function update() {
 
     update(); // on initial page loading, use update() to show the visualization
 
+//frewuency slider
 
 var margin = {top: 194, right: 50, bottom: 214, left: 50},
     width = 960 - margin.left - margin.right,
@@ -233,7 +241,7 @@ var x = d3.scale.log()
     .domain([Math.pow(10, 0), Math.pow(10, 5)])
     .range([0, width]);
 
-var y = d3.random.normal(height / 2, height / 8);
+var y = d3.random.normal(height / 4, height / 8);
 
 var brush = d3.svg.brush()
     .x(x)
@@ -256,7 +264,7 @@ var svg = d3.select("body").append("svg")
 svg.append("g")
     .attr("class", "x axis")
     .attr("transform", "translate(0," + height + ")")
-    .call(d3.svg.axis().scale(x).orient("bottom"));
+    .call(d3.svg.axis().scale(x).orient("bottom").ticks(20, ",.1s").tickSize(6, 0));
 
 
 var brushg = svg.append("g")
@@ -264,11 +272,12 @@ var brushg = svg.append("g")
     .call(brush);
 
 brushg.selectAll(".resize").append("path")
-    .attr("transform", "translate(0," +  height / 2 + ")")
+    .attr("transform", "translate(0," +  height  + ")")
     .attr("d", arc);
 
 brushg.selectAll("rect")
-    .attr("height", height);
+    .attr("transform", "translate(0," +  height *3/4 + ")")
+    .attr("height", height /2);
 
 brushstart();
 brushmove();
@@ -287,91 +296,90 @@ function brushend() {
   svg.classed("selecting", !d3.event.target.empty());
   update();
 }
+
  //date slider
-/*
+
 d3.select(self.frameElement).style("height", diameter + "px");
 
-var margin = {top: 200, right: 40, bottom: 200, left: 40},
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+var timeMargin = {top: 200, right: 40, bottom: 200, left: 40},
+    timeWidth = 960 - timeMargin.left - timeMargin.right,
+    timeHeight = 500 - timeMargin.top - timeMargin.bottom;
 
-var x = d3.time.scale(d3.time.hour, 1)
-    .domain([new Date(2013, 2, 1), new Date(2013, 2, 15) - 1])
-    .range([0, width]);
+var timeX = d3.scale.linear()
+    .domain([0,24])
+    .range([0, timeWidth]);
 
-var brush = d3.svg.brush()
-    .x(x)
-    .extent([new Date(2013, 2, 2), new Date(2013, 2, 3)])
-    .on("brush", brushed);
+var timeBrush = d3.svg.brush()
+    .x(timeX)
+    //.extent([0,7])
+    .on("brush", timeBrushed);
 
-var svg = d3.select("body").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
+var svg2 = d3.select("body").append("svg")
+    .attr("width", timeWidth + timeMargin.left + timeMargin.right)
+    .attr("height", timeHeight + timeMargin.top + timeMargin.bottom)
   .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + timeMargin.left + "," + timeMargin.top + ")");
 
-svg.append("rect")
+svg2.append("rect")
     .attr("class", "grid-background")
-    .attr("width", width)
-    .attr("height", height);
+    .attr("width", timeWidth)
+    .attr("height", timeHeight);
 
-svg.append("g")
+svg2.append("g")
     .attr("class", "x grid")
-    .attr("transform", "translate(0," + height + ")")
+    .attr("transform", "translate(0," + timeHeight + ")")
     .call(d3.svg.axis()
-        .scale(x)
+        .scale(timeX)
         .orient("bottom")
-        .ticks(d3.time.hours, 12)
-        .tickSize(-height)
+        .ticks(24)
+        .tickSize(-timeHeight)
         .tickFormat(""))
-  .selectAll(".tick")
-    .classed("minor", function(d) { return d.getHours(); });
 
-svg.append("g")
+svg2.append("g")
     .attr("class", "x axis")
-    .attr("transform", "translate(0," + height + ")")
+    .attr("transform", "translate(0," + timeHeight + ")")
     .call(d3.svg.axis()
-      .scale(x)
+      .scale(timeX)
       .orient("bottom")
-      .ticks(d3.time.days)
+      .ticks(24)
       .tickPadding(0))
   .selectAll("text")
     .attr("x", 6)
     .style("text-anchor", null);
 
-var gBrush = svg.append("g")
+var gBrush = svg2.append("g")
     .attr("class", "brush")
-    .call(brush);
+    .call(timeBrush);
 
 gBrush.selectAll("rect")
-    .attr("height", height);
+    .attr("height", timeHeight);
 
-function brushed() {
-  var extent0 = brush.extent(),
+function timeBrushed() {
+  var extent0 = timeBrush.extent(),
       extent1;
 
   // if dragging, preserve the width of the extent
   if (d3.event.mode === "move") {
-    var d0 = d3.time.day.round(extent0[0]),
-        d1 = d3.time.day.offset(d0, Math.round((extent0[1] - extent0[0]) / 864e5));
-    extent1 = [d0, d1];
+    var d0 = extent0[0];
+        d1 = extent0[1];
+    extent1 = [Math.round(d0), Math.round(d1)];
   }
 
   // otherwise, if resizing, round both dates
   else {
-    extent1 = extent0.map(d3.time.day.round);
+    extent1 = extent0.map(Math.round);
 
     // if empty when rounded, use floor & ceil instead
     if (extent1[0] >= extent1[1]) {
-      extent1[0] = d3.time.day.floor(extent0[0]);
-      extent1[1] = d3.time.day.ceil(extent0[1]);
+      extent1[0] = extent0[0];
+      extent1[1] = extent0[1];
     }
   }
-
-  d3.select(this).call(brush.extent(extent1));
+  //console.log(extent1);
+  minTime = extent1[0];
+  maxTime = extent1[1];
+  d3.select(this).call(timeBrush.extent(extent1));
+  update();
 }
-*/
-
-
 
 </script>
