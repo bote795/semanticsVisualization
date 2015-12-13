@@ -111,6 +111,7 @@ var minFreq = 5000;
 var maxFreq = Math.pow(10, 5);
 
 var maxSize = 1570;
+var PicThreshold = 80;
 var elementSize = maxSize;
 
 var diameter = 960,
@@ -172,7 +173,9 @@ function update() {
 
     node.append("title")
         .text(function(d) { return d.className + ": " + format(d.value); });
-  /*node.append("pattern")
+  if (elementSize <= 157 ) 
+  {
+  node.append("pattern")
     .attr('id', function(d) { return (d.className.replace(/ /g,'')+"-icon");}) // just create a unique id (id comes from the json)
     .attr('width', 1)
     .attr('height', 1)
@@ -183,13 +186,22 @@ function update() {
       .attr("y", 0)
       .attr("height", 1)
       .attr("width", 1)
-      .attr("preserveAspectRatio", "xMinYMin slice");*/
-   
-      node.append("circle")
+      .attr("preserveAspectRatio", "xMinYMin slice");
+   }
+
+      if (elementSize <= PicThreshold) 
+      {
+        node.append("circle")
           .attr("r", function(d) { return d.r; })
-          //.style("stroke", "black")     
         .style("fill", function(d) { return color(getRandomInt(0,20)); })
-       // .style("fill", function(d) { return ("url(#"+d.className.replace(/ /g,'')+"-icon)");})
+        .style("fill", function(d) { return ("url(#"+d.className.replace(/ /g,'')+"-icon)");})
+      } 
+      else
+      {
+        node.append("circle")
+          .attr("r", function(d) { return d.r; })
+        .style("fill", function(d) { return color(getRandomInt(0,20)); })
+      }
 
 
       node.append("text")
@@ -333,6 +345,7 @@ var brushPercentage = d3.svg.brush()
     if (d3.event.sourceEvent) { // not a programmatic event
       value = xScale.invert(d3.mouse(this)[0]);
       elementSize = (value.toFixed(0)/100*maxSize).toFixed(0);
+      console.log(elementSize);
       brush.extent([value, value]);
       update();
     }
