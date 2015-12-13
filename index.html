@@ -115,8 +115,10 @@ function update() {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
+    var laidOut = bubble.nodes(classes(root));
+
     var node = svg1.selectAll(".node")
-        .data(bubble.nodes(classes(root))
+        .data(laidOut
         .filter(function(d) { return !d.children && d.value <= maxFreq && minFreq <= d.value; }))
         //.filter(function(d) { return d.value <= maxFreq && minFreq <= d.value; }))
         .enter().append("g")
