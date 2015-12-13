@@ -108,6 +108,9 @@ svg:nth-of-type(2) {
 var minFreq = 5000;
 var maxFreq = Math.pow(10, 5);
 
+var minTime = 0;
+var maxTime = 24;
+
 var maxSize = 1570;
 var PicThreshold = 80;
 var elementSize = maxSize;
@@ -158,7 +161,13 @@ function update() {
 
     var node = svg1.selectAll(".node")
         .data(laidOut
-        .filter(function(d) { return !d.children && d.value <= maxFreq && minFreq <= d.value; }))
+          .filter(function(d) { //console.log(d);
+              return !d.children 
+                && d.value <= maxFreq 
+                && minFreq <= d.value 
+                && d.HourOfDay.time >= minTime 
+                && d.HourOfDay.time < maxTime; 
+            }))
         //.filter(function(d) { return d.value <= maxFreq && minFreq <= d.value; }))
         .enter().append("g")
         .attr("class", "node")
@@ -296,8 +305,8 @@ var timeMargin = {top: 200, right: 40, bottom: 200, left: 40},
     timeWidth = 960 - timeMargin.left - timeMargin.right,
     timeHeight = 500 - timeMargin.top - timeMargin.bottom;
 
-var timeX = d3.time.scale()
-    .domain([0,24]).nice(d3.time.day, 1)
+var timeX = d3.scale.linear()
+    .domain([0,24])
     .range([0, timeWidth]);
 
 var timeBrush = d3.svg.brush()
@@ -322,11 +331,9 @@ svg2.append("g")
     .call(d3.svg.axis()
         .scale(timeX)
         .orient("bottom")
-        .ticks(d3.time.hours, 1)
+        .ticks(24)
         .tickSize(-timeHeight)
         .tickFormat(""))
-  .selectAll(".tick")
-    .classed("minor", function(d) { return d.getHours(); });
 
 svg2.append("g")
     .attr("class", "x axis")
@@ -334,7 +341,7 @@ svg2.append("g")
     .call(d3.svg.axis()
       .scale(timeX)
       .orient("bottom")
-      .ticks(d3.time.hours)
+      .ticks(24)
       .tickPadding(0))
   .selectAll("text")
     .attr("x", 6)
@@ -353,23 +360,26 @@ function timeBrushed() {
 
   // if dragging, preserve the width of the extent
   if (d3.event.mode === "move") {
-    var d0 = d3.time.hour.round(extent0[0]),
-        d1 = d3.time.hour.offset(d0, Math.round((extent0[1] - extent0[0]) ));
-    extent1 = [d0, d1];
+    var d0 = extent0[0];
+        d1 = extent0[1];
+    extent1 = [Math.round(d0), Math.round(d1)];
   }
 
   // otherwise, if resizing, round both dates
   else {
-    extent1 = extent0.map(d3.time.hour.round);
+    extent1 = extent0.map(Math.round);
 
     // if empty when rounded, use floor & ceil instead
     if (extent1[0] >= extent1[1]) {
-      extent1[0] = d3.time.hour.floor(extent0[0]);
-      extent1[1] = d3.time.hour.ceil(extent0[1]);
+      extent1[0] = extent0[0];
+      extent1[1] = extent0[1];
     }
   }
-
+  //console.log(extent1);
+  minTime = extent1[0];
+  maxTime = extent1[1];
   d3.select(this).call(timeBrush.extent(extent1));
+  update();
 }
 
 </script>
