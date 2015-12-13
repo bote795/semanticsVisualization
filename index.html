@@ -134,12 +134,13 @@ var diameter = 960,
 
     var svg1 = d3.select("body").append("svg")
         .attr("width", diameter)
-        .attr("height", diameter)
-        .attr("class", "bubble");
+        .attr("height", diameter
+)        .attr("class", "bubble");
 
-  var colorScale = d3.scale.log()
-      .domain([Math.pow(10, 0), Math.pow(10, 5)])
-      .range([d3.rgb(255,255,255), d3.rgb(100,55,235)]);
+  var colorScale = d3.scale.linear()
+      .domain([Math.pow(10, 0), 60000])
+      .range(["hsl(255,100%,50%)", "hsl(0,75%,50%)"])
+      .interpolate(d3.interpolateHsl);
 
 
     
@@ -196,14 +197,14 @@ function update() {
       {
         node.append("circle")
           .attr("r", function(d) { return d.r; })
-        .style("fill", function(d) { return color(getRandomInt(0,20)); })
+        .style("fill", function(d) { return colorScale(d.value); })
         .style("fill", function(d) { return ("url(#"+d.className.replace(/ /g,'')+"-icon)");})
       } 
       else
       {
         node.append("circle")
           .attr("r", function(d) { return d.r; })
-        .style("fill", function(d) { return color(getRandomInt(0,20)); })
+        .style("fill", function(d) { return colorScale(d.value); })
       }
 
       node.append("text")
