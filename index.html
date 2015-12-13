@@ -85,11 +85,7 @@ circle {
 var minFreq = 5000;
 var maxFreq = 150000;
 
-function update() {
-      // everytime update() is called, we (re)compute the layout, using the
-      // previously provided value function
-
-    var diameter = 960,
+var diameter = 960,
         format = d3.format(",d"),
         color = d3.scale.category20c();
 
@@ -103,12 +99,22 @@ function update() {
         .attr("height", diameter)
         .attr("class", "bubble");
 
-    d3.json("FullData", function(error, root) {
-      if (error) throw error;
-    function getRandomInt(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
     
+    
+
+function update() {
+      // everytime update() is called, we (re)compute the layout, using the
+      // previously provided value function
+    
+
+      
+
+    d3.json("FullData", function(error, root) {
+          if (error) throw error;
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
     var node = svg1.selectAll(".node")
         .data(bubble.nodes(classes(root))
         .filter(function(d) { return !d.children && d.value <= maxFreq && minFreq <= d.value; }))
