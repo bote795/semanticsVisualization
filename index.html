@@ -107,7 +107,7 @@ function update() {
       // previously provided value function
     
 
-      
+
 
     d3.json("FullData", function(error, root) {
           if (error) throw error;
@@ -168,14 +168,12 @@ function update() {
     update(); // on initial page loading, use update() to show the visualization
 
 
-var data = d3.range(800).map(Math.random);
-
 var margin = {top: 194, right: 50, bottom: 214, left: 50},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
-var x = d3.scale.linear()
-    .domain([0,150000])
+var x = d3.scale.log()
+    .domain([Math.pow(10, 0), Math.pow(10, 6)])
     .range([0, width]);
 
 var y = d3.random.normal(height / 2, height / 8);
@@ -195,7 +193,7 @@ var arc = d3.svg.arc()
 var svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
-  .append("g")
+    .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 svg.append("g")
@@ -203,11 +201,6 @@ svg.append("g")
     .attr("transform", "translate(0," + height + ")")
     .call(d3.svg.axis().scale(x).orient("bottom"));
 
-var circle = svg.append("g").selectAll("circle")
-    .data(data)
-  .enter().append("circle")
-    .attr("transform", function(d) { return "translate(" + x(d) + "," + y() + ")"; })
-    .attr("r", 3.5);
 
 var brushg = svg.append("g")
     .attr("class", "brush")
@@ -229,7 +222,6 @@ function brushstart() {
 
 function brushmove() {
   var s = brush.extent();
-  circle.classed("selected", function(d) { return s[0] <= d && d <= s[1]; });
   minFreq = s[0];
   maxFreq = s[1];
 }
