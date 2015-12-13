@@ -83,14 +83,22 @@ circle {
 <script>
 
 var minFreq = 5000;
-var maxFreq = 150000;
+var maxFreq = Math.pow(10, 5);
 
 var diameter = 960,
         format = d3.format(",d"),
-        color = d3.scale.category20c();
+        color = d3.scale.category20();
 
     var bubble = d3.layout.pack()
-        .sort(null)
+        .sort( function(a, b) 
+        {
+          var threshold = Math.pow(10, 6);
+          if ((a.value > threshold) && (b.value > threshold)) {
+              return -(a.value - b.value);
+          } else {
+              return -1;
+          }
+        })
         .size([diameter, diameter])
         .padding(1.5);
 
@@ -99,6 +107,12 @@ var diameter = 960,
         .attr("height", diameter)
         .attr("class", "bubble");
 
+  var colorScale = d3.scale.log()
+      .domain([Math.pow(10, 0), Math.pow(10, 5)])
+      .range([d3.rgb(255,255,255), d3.rgb(100,55,235)]);
+
+
+    
     
     
 
@@ -110,47 +124,48 @@ function update() {
 
 
     d3.json("FullData", function(error, root) {
-          if (error) throw error;
+        if (error) throw error;
         function getRandomInt(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-    var laidOut = bubble.nodes(classes(root));
+        var laidOut = bubble.nodes(classes(root));
 
-    var node = svg1.selectAll(".node")
-        .data(laidOut
-        .filter(function(d) { return !d.children && d.value <= maxFreq && minFreq <= d.value; }))
-        //.filter(function(d) { return d.value <= maxFreq && minFreq <= d.value; }))
-        .enter().append("g")
-        .attr("class", "node")
-        .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+        var node = svg1.selectAll(".node")
+            .data(laidOut
+            .filter(function(d) { return !d.children && d.value <= maxFreq && minFreq <= d.value; }))
+            //.filter(function(d) { return d.value <= maxFreq && minFreq <= d.value; }))
+            .enter().append("g")
+            .attr("class", "node")
+            .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
-    node.append("title")
-        .text(function(d) { return d.className + ": " + format(d.value); });
-  /*node.append("pattern")
-    .attr('id', function(d) { return (d.className.replace(/ /g,'')+"-icon");}) // just create a unique id (id comes from the json)
-    .attr('width', 1)
-    .attr('height', 1)
-    .attr('patternContentUnits', 'objectBoundingBox')
-    .append("svg:image")
-      .attr("xlink:xlink:href", function(d) { return (d.url);}) //The double xlink:xlink is a necessary hack (first "xlink:" is lost...).
-      .attr("x", 0)
-      .attr("y", 0)
-      .attr("height", 1)
-      .attr("width", 1)
-      .attr("preserveAspectRatio", "xMinYMin slice");*/
-   
-      node.append("circle")
-          .attr("r", function(d) { return d.r; })
-          //.style("stroke", "black")     
-        .style("fill", function(d) { return color(getRandomInt(0,20)); })
-       // .style("fill", function(d) { return ("url(#"+d.className.replace(/ /g,'')+"-icon)");})
+        node.append("title")
+            .text(function(d) { return d.className + ": " + format(d.value); });
+      /*node.append("pattern")
+        .attr('id', function(d) { return (d.className.replace(/ /g,'')+"-icon");}) // just create a unique id (id comes from the json)
+        .attr('width', 1)
+        .attr('height', 1)
+        .attr('patternContentUnits', 'objectBoundingBox')
+        .append("svg:image")
+          .attr("xlink:xlink:href", function(d) { return (d.url);}) //The double xlink:xlink is a necessary hack (first "xlink:" is lost...).
+          .attr("x", 0)
+          .attr("y", 0)
+          .attr("height", 1)
+          .attr("width", 1)
+          .attr("preserveAspectRatio", "xMinYMin slice");*/
+
+       
+          node.append("circle")
+            .attr("r", function(d) { return d.r; })
+              //.style("stroke", "black")     
+            .style("fill", function(d) { return color(getRandomInt(0,20)); })
+           // .style("fill", function(d) { return ("url(#"+d.className.replace(/ /g,'')+"-icon)");})
 
 
-      node.append("text")
-          .attr("dy", ".3em")
-          .style("text-anchor", "middle")
-          .text(function(d) { return d.className.substring(0, d.r / 3); });
+          node.append("text")
+              .attr("dy", ".3em")
+              .style("text-anchor", "middle")
+              .text(function(d) { return d.className.substring(0, d.r / 3); });
     });
 
     // Returns a flattened hierarchy containing all leaf nodes under the root.
@@ -175,7 +190,7 @@ var margin = {top: 194, right: 50, bottom: 214, left: 50},
     height = 500 - margin.top - margin.bottom;
 
 var x = d3.scale.log()
-    .domain([Math.pow(10, 0), Math.pow(10, 6)])
+    .domain([Math.pow(10, 0), Math.pow(10, 5)])
     .range([0, width]);
 
 var y = d3.random.normal(height / 2, height / 8);
