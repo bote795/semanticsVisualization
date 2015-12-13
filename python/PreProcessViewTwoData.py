@@ -76,9 +76,8 @@ uniqueDeviceMaxDict={}
 TagsDict={}
 TagsDict["name"] = "tags"
 children=[]
-tagSortedArray=sorted(tagFreqDict, key=tagFreqDict.get, reverse=True) #highest at the top
-for key in tagSortedArray:
-	value= tagFreqDict[key]
+#tagSortedArray=sorted(tagFreqDict, key=tagFreqDict.get, reverse=True) #highest at the top
+for key, value in tagFreqDict.items():
 	if len(tagDeviceDict[key]) == 1:
 		print ("Key:"+ key + " : "+str(value))
 		pprint (tagDeviceDict[key])
@@ -108,6 +107,6 @@ for key in tagSortedArray:
 TagsDict["children"]= children
 pprint(TagsDict);
 print (len(children))
-with open('../FullData', 'w') as outfile:
+with open('../FullDataTags', 'w') as outfile:
    json.dump(TagsDict, outfile)
 print ("Job is complete")
