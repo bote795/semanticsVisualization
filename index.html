@@ -296,13 +296,13 @@ var timeMargin = {top: 200, right: 40, bottom: 200, left: 40},
     timeWidth = 960 - timeMargin.left - timeMargin.right,
     timeHeight = 500 - timeMargin.top - timeMargin.bottom;
 
-var timeX = d3.time.scale(d3.time.hour, 1)
-    .domain([new Date(2013, 2, 1), new Date(2013, 2, 15) - 1])
+var timeX = d3.time.scale()
+    .domain([0,24]).nice(d3.time.day, 1)
     .range([0, timeWidth]);
 
 var timeBrush = d3.svg.brush()
     .x(timeX)
-    .extent([new Date(2013, 2, 2), new Date(2013, 2, 3)])
+    //.extent([0,7])
     .on("brush", timeBrushed);
 
 var svg2 = d3.select("body").append("svg")
@@ -342,34 +342,34 @@ svg2.append("g")
 
 var gBrush = svg2.append("g")
     .attr("class", "brush")
-    .call(brush);
+    .call(timeBrush);
 
 gBrush.selectAll("rect")
     .attr("height", timeHeight);
 
 function timeBrushed() {
-  var extent0 = brush.extent(),
+  var extent0 = timeBrush.extent(),
       extent1;
 
   // if dragging, preserve the width of the extent
   if (d3.event.mode === "move") {
-    var d0 = d3.time.day.round(extent0[0]),
-        d1 = d3.time.day.offset(d0, Math.round((extent0[1] - extent0[0]) / 864e5));
+    var d0 = d3.time.hour.round(extent0[0]),
+        d1 = d3.time.hour.offset(d0, Math.round((extent0[1] - extent0[0]) ));
     extent1 = [d0, d1];
   }
 
   // otherwise, if resizing, round both dates
   else {
-    extent1 = extent0.map(d3.time.day.round);
+    extent1 = extent0.map(d3.time.hour.round);
 
     // if empty when rounded, use floor & ceil instead
     if (extent1[0] >= extent1[1]) {
-      extent1[0] = d3.time.day.floor(extent0[0]);
-      extent1[1] = d3.time.day.ceil(extent0[1]);
+      extent1[0] = d3.time.hour.floor(extent0[0]);
+      extent1[1] = d3.time.hour.ceil(extent0[1]);
     }
   }
 
-  d3.select(this).call(brush.extent(extent1));
+  d3.select(this).call(timeBrush.extent(extent1));
 }
 
 </script>
