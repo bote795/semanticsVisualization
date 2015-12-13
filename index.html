@@ -185,9 +185,7 @@ function update() {
       .attr("width", 1)
       .attr("preserveAspectRatio", "xMinYMin slice");
    }
-   console.log(counter);
-
-      if (counter <= PicThreshold) 
+   if(counter <= PicThreshold) 
       {
         node.append("circle")
           .attr("r", function(d) { return d.r; })
@@ -200,7 +198,6 @@ function update() {
           .attr("r", function(d) { return d.r; })
         .style("fill", function(d) { return color(getRandomInt(0,20)); })
       }
-
 
       node.append("text")
           .attr("dy", ".3em")
