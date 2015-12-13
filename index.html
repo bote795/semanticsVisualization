@@ -53,14 +53,6 @@ var xAxis = d3.svg.axis()
     .tickSize(0)
     .tickPadding(15)
 
-    function brushed () {
-      // body...
-    }
-var brush = d3.svg.brush()
-    .x(xScale)
-    .extent([0, 100])
-    .on("brush", brushed)
-
 var svg = d3.select("body").append("svg")
     .attr("width", diameter)
     .attr("height", diameter)
@@ -71,33 +63,24 @@ var slidercontainer = svg.append("g")
   .attr("transform", "translate(10, 10)")
 var axis = slidercontainer.append("g")
   .call(xAxis)
-var slider = slidercontainer.append("g")
-  .call(brush)
-  .classed("slider", true)
-slider.selectAll(".extent,.resize")
-    .remove();
-//circle manipulaters
-  slider.append("circle")
-    .attr("r", 10)
-    .attr("fill", "Red")
-    .classed("handle", true)
-    .attr("transform", "translate(0,0)")
-
-  d3.select(".domain")
-    .select(function() {return this.parentNode.appendChild(this.cloneNode(true))})
-    .classed("halo", true)
-slider
-    .call(brush.extent([0, 100]))
 
 d3.json("FullData", function(error, root) {
   if (error) throw error;
-  
+function update (SizeThreshold) {
+  SizeThreshold = typeof SizeThreshold == 'undefined' ? SizeThreshold: 100;
+  var size= classes(root).children.length*SizeThreshold/100;
+  console.log(size);
+  var dataElements;
+  if (SizeThreshold == 100)
+    dataElements =classes(root);
+  else;
+    //dataElements =classes(root).splice(0,size);
   var node = svg.selectAll(".node")
-      .data(bubble.nodes(classes(root))
-      .filter(function(d) { return !d.children; }))
-    .enter().append("g")
-      .attr("class", "node")
-      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+    .data(bubble.nodes(dataElements)
+    .filter(function(d) { return !d.children; }))
+  .enter().append("g")
+    .attr("class", "node")
+    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
   node.append("title")
       .text(function(d) { return d.className + ": " + format(d.value); });
@@ -108,10 +91,50 @@ d3.json("FullData", function(error, root) {
 
 
   node.append("text")
-      .attr("dy", ".3em")
+      .attr('font-family', 'Helvetica')
+      .attr('font-size', "9pt")
       .style("text-anchor", "middle")
       .text(function(d) { return d.className.substring(0, d.r / 3); });
+      //redraw
+  function brushed () {
+    var value = brush.extent()[0];
+    if (d3.event.sourceEvent) { // not a programmatic event
+      value = xScale.invert(d3.mouse(this)[0]);
+      console.log(value);
+      brush.extent([value, value]);
+      update(value);
+    }
 
+    handle.attr("cx", xScale(value));
+    d3.select("body").style("background-color", d3.hsl(value, .8, .8));
+  }
+  var brush = d3.svg.brush()
+      .x(xScale)
+      .extent([0, 100])
+      .on("brush", brushed)
+  var slider = slidercontainer.append("g")
+    .call(brush)
+    .classed("slider", true)
+  slider.selectAll(".extent,.resize")
+      .remove();
+  //circle manipulaters
+  var handle=  slider.append("circle")
+      .attr("r", 10)
+      .attr("fill", "Red")
+      .classed("handle", true)
+      .attr("transform", "translate(0,0)")
+
+    d3.select(".domain")
+      .select(function() {return this.parentNode.appendChild(this.cloneNode(true))})
+      .classed("halo", true)
+  slider
+      .call(brush.event)
+    .transition() // gratuitous intro!
+      .duration(750)
+      .call(brush.extent([0, 100]))
+      .call(brush.event);
+  }  
+  update();
 });
 
 
