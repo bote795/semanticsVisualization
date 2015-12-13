@@ -106,7 +106,7 @@ function update() {
       // everytime update() is called, we (re)compute the layout, using the
       // previously provided value function
     
-
+    svg1.selectAll("*").remove();
 
 
     d3.json("FullData", function(error, root) {
@@ -186,7 +186,7 @@ var brush = d3.svg.brush()
     .on("brushend", brushend);
 
 var arc = d3.svg.arc()
-    .outerRadius(height / 2)
+    .outerRadius(height / 4)
     .startAngle(0)
     .endAngle(function(d, i) { return i ? -Math.PI : Math.PI; });
 
