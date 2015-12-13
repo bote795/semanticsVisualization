@@ -158,10 +158,11 @@ function update() {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
     var laidOut = bubble.nodes(classes(root));
-
+    var counter=0;
     var node = svg1.selectAll(".node")
         .data(laidOut
           .filter(function(d) { //console.log(d);
+            if(!d.children && d.value <= maxFreq && minFreq <= d.value && d.HourOfDay.time >= minTime && d.HourOfDay.time < maxTime) counter++;
               return !d.children 
                 && d.value <= maxFreq 
                 && minFreq <= d.value 
@@ -175,7 +176,7 @@ function update() {
 
     node.append("title")
         .text(function(d) { return d.className + ": " + format(d.value); });
-  if (elementSize <= 157 ) 
+  if (counter <= PicThreshold ) 
   {
   node.append("pattern")
     .attr('id', function(d) { return (d.className.replace(/ /g,'')+"-icon");}) // just create a unique id (id comes from the json)
@@ -190,8 +191,7 @@ function update() {
       .attr("width", 1)
       .attr("preserveAspectRatio", "xMinYMin slice");
    }
-
-      if (elementSize <= PicThreshold) 
+   if(counter <= PicThreshold) 
       {
         node.append("circle")
           .attr("r", function(d) { return d.r; })
@@ -204,7 +204,6 @@ function update() {
           .attr("r", function(d) { return d.r; })
         .style("fill", function(d) { return color(getRandomInt(0,20)); })
       }
-
 
       node.append("text")
           .attr("dy", ".3em")
