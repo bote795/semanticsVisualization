@@ -156,12 +156,7 @@ function update() {
         function getRandomInt(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
-    var elements = classes(root);
-    if (elementSize != maxSize) 
-    {
-      elements.children = elements.children.splice(0,elementSize);
-    }
-    var laidOut = bubble.nodes(elements);
+    var laidOut = bubble.nodes(classes(root));
 
     var node = svg1.selectAll(".node")
         .data(laidOut
@@ -292,65 +287,6 @@ function brushend() {
   svg.classed("selecting", !d3.event.target.empty());
   update();
 }
-//second filter percentage
-var xScale = d3.scale.linear()
-    .domain([1, 100]) //phyiscal inputed values
-    .range([1,900]) //outputed numbers
-    .clamp(true)
-var xAxis = d3.svg.axis()
-    .scale(xScale)
-    .tickSize(0)
-    .tickPadding(15)
-var slidercontainer = svg.append("g")
-  .attr("transform", "translate(0, 10)")
-
-var axis = slidercontainer.append("g")
-  .call(xAxis) 
-var brushPercentage = d3.svg.brush()
-      .x(xScale)
-      .extent([0, 100])
-      .on("brush", brushedUpdateNum)
-      .on("brushend", brushedUpdate)
-  var slider = slidercontainer.append("g")
-    .call(brushPercentage)
-    .classed("slider", true)
-  slider.selectAll(".extent,.resize")
-      .remove();
-  //circle manipulaters
-  var handle=  slider.append("circle")
-      .attr("r", 10)
-      .attr("fill", "Red")
-      .classed("handle", true)
-      .attr("transform", "translate(0,0)")
-    d3.select(".domain")
-      .select(function() {return this.parentNode.appendChild(this.cloneNode(true))})
-      .classed("halo", true)
-  slider
-      .call(brushPercentage.event)
-    .transition() // gratuitous intro!
-      .duration(750)
-      .call(brushPercentage.extent([0, 100]))
-      .call(brushPercentage.event); 
-   function brushedUpdateNum () {
-    var value = brush.extent()[0];
-    if (d3.event.sourceEvent) { // not a programmatic event
-      value = xScale.invert(d3.mouse(this)[0]);
-      elementSize = (value.toFixed(0)/100*maxSize).toFixed(0);
-      brush.extent([value, value]);
-    }
-    handle.attr("cx", xScale(value));
-  }         
-  function brushedUpdate () {
-    var value = brush.extent()[0];
-    if (d3.event.sourceEvent) { // not a programmatic event
-      value = xScale.invert(d3.mouse(this)[0]);
-      elementSize = (value.toFixed(0)/100*maxSize).toFixed(0);
-      console.log(elementSize);
-      brush.extent([value, value]);
-      update();
-    }
-    handle.attr("cx", xScale(value));
-  }        
  //date slider
 /*
 d3.select(self.frameElement).style("height", diameter + "px");
