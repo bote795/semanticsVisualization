@@ -231,6 +231,13 @@ h1{
         seasonChosen = season;
         update();
       }
+
+      function click(d) {
+        console.log('https://flickr.com/search/?q=' + d.className);
+      if (d.className) {
+        window.open('https://flickr.com/search/?q=' + d.className, '_blank');
+      }
+    }
       
       d3.element.dropdownmenu('#menu')
         .add({
@@ -347,12 +354,14 @@ function colorCircle(d)
       .attr("r", function(d) { return d.r; })
     .style("fill", colorCircle)
     .style("fill", function(d) { return ("url(#"+d.className.replace(/ /g,'')+"-icon)");})
+    .on('click', click)
   } 
   else
   {
     node.append("circle")
       .attr("r", function(d) { return d.r; })
     .style("fill", colorCircle)
+    .on('click', click)
   }
 
   node.append("text")
@@ -431,12 +440,14 @@ function update() {
       .attr("r", function(d) { return d.r; })
     .style("fill", colorCircle)
     .style("fill", function(d) { return ("url(#"+d.className.replace(/ /g,'')+"-icon)");})
+    .on('click', click)
   } 
   else
   {
     nodeEnter.append("circle")
       .attr("r", function(d) { return d.r; })
     .style("fill", colorCircle)
+    .on('click', click)
   }
 
   nodeEnter.append("text")
