@@ -569,15 +569,18 @@ update(); // on initial page loading, use update() to show the visualization
       .attr("height", timeHeight + timeMargin.top + timeMargin.bottom)
     .append("g")
       .attr("transform", "translate(" + timeMargin.left + "," + timeMargin.top + ")");
-
-  svg2.append("rect")
+//rect
+var slidercontainer=svg.append("g")
+    .attr("transform", "translate(0,0)");
+  slidercontainer.append("rect")
       .attr("class", "grid-background")
       .attr("width", timeWidth)
+      .attr("transform", "translate(0,200)")
       .attr("height", timeHeight);
 
-  svg2.append("g")
+  slidercontainer.append("g")
       .attr("class", "x grid")
-      .attr("transform", "translate(0," + timeHeight + ")")
+      .attr("transform", "translate(0,300)")
       .call(d3.svg.axis()
           .scale(timeX)
           .orient("bottom")
@@ -585,9 +588,9 @@ update(); // on initial page loading, use update() to show the visualization
           .tickSize(-timeHeight)
           .tickFormat(""))
 
-  svg2.append("g")
+  slidercontainer.append("g")
       .attr("class", "x axis")
-      .attr("transform", "translate(0," + timeHeight + ")")
+      .attr("transform", "translate(0,290)")
       .call(d3.svg.axis()
         .scale(timeX)
         .orient("bottom")
@@ -597,12 +600,13 @@ update(); // on initial page loading, use update() to show the visualization
       .attr("x", 6)
       .style("text-anchor", null);
 
-  var gBrush = svg2.append("g")
+  var gBrush = slidercontainer.append("g")
       .attr("class", "brush")
       .call(timeBrush);
 
   gBrush.selectAll("rect")
-      .attr("height", timeHeight);
+      .attr("height", timeHeight)
+      .attr("transform", "translate(0,200)");
 
   function timeBrushed() {
     var extent0 = timeBrush.extent(),
