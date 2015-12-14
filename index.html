@@ -7,11 +7,13 @@
   }
 
   body {
-    background-color: #004c4d;
+    /*background-color: #004c4d;*/
+    background-color: #888888;
+
   }
 
   svg {
-    font: 10px sans-serif;
+    font: 12px sans-serif;
   }
 
   circle {
@@ -524,6 +526,10 @@ update(); // on initial page loading, use update() to show the visualization
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+  svg.append("text")
+      .text("Frequency of tags:")
+      .attr("transform", "translate(0,50)");
+
   svg.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
@@ -577,6 +583,11 @@ update(); // on initial page loading, use update() to show the visualization
       //.extent([0,7])
       .on("brush", timeBrushed);
 //rect
+
+svg.append("text")
+      .text("Hour of Day:")
+      .attr("transform", "translate(0,175)");
+
 var slidercontainer=svg.append("g")
     .attr("transform", "translate(0,0)");
   slidercontainer.append("rect")
