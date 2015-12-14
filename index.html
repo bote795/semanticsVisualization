@@ -349,10 +349,23 @@ function colorCircle(d)
 function update() {
   d3.json("FullDataTags", function(error, root) {
         if (error) throw error;
-      function getRandomInt(min, max) {
-          return Math.floor(Math.random() * (max - min + 1)) + min;
-      }
-  var laidOut = bubble.nodes(classes(root));
+  var temp=[];
+  var test=classes(root);
+  for (var i = test.children.length - 1; i >= 0; i--) {
+    var d =test.children[i];
+    if(!d.children 
+              && d.value <= maxFreq 
+              && minFreq <= d.value 
+              && d.HourOfDay.time >= minTime 
+              && d.HourOfDay.time < maxTime
+              && (d.season["name"] == seasonChosen || seasonChosen == "all")
+              && (d.device["name"] == deviceChosen || deviceChosen == "all"))
+    {
+      temp.push(d);
+    }
+  };
+  test.children=temp;      
+  var laidOut = bubble.nodes(test);
   var counter=0;
   var node = svg1.selectAll(".node")
       .data(laidOut
