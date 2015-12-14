@@ -2,385 +2,469 @@
 <meta charset="utf-8">
 <style>
 
-text {
-  font: 10px sans-serif;
-}
+  text {
+    font: 10px sans-serif;
+  }
 
-svg {
-  font: 10px sans-serif;
-}
+  body {
+    background-color: #004c4d;
+  }
 
-circle {
-  -webkit-transition: fill-opacity 250ms linear;
-}
+  svg {
+    font: 10px sans-serif;
+  }
 
-.selecting circle {
-  fill-opacity: .2;
-}
+  circle {
+    -webkit-transition: fill-opacity 250ms linear;
+  }
 
-.selecting circle.selected {
-  stroke: #f00;
-}
+  .selecting circle {
+    fill-opacity: .2;
+  }
 
-.resize path {
-  fill: #666;
-  fill-opacity: .8;
-  stroke: #000;
-  stroke-width: 1.5px;
-}
+  .selecting circle.selected {
+    stroke: #f00;
+  }
 
-.axis path, .axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
+  .resize path {
+    fill: #666;
+    fill-opacity: .8;
+    stroke: #000;
+    stroke-width: 1.5px;
+  }
 
-.brush .extent {
-  fill-opacity: .125;
-  shape-rendering: crispEdges;
-}
-svg:nth-of-type(2) {
-  float: right;
-  position: absolute;
-}
-.domain {
-  fill: none;
-  stroke: #000;
-  stroke-opacity: .3;
-  stroke-width: 10px;
-  stroke-linecap: round;
-}
-.tick {
-  font-size: 10px;
-}
-.selecting circle {
-  fill-opacity: .2;
-}
-.selecting circle.selected {
-  stroke: #f00;
-}
-.handle {
-  fill: #fff;
-  stroke: #000;
-  stroke-opacity: .5;
-  stroke-width: 1.25px;
-  cursor: crosshair;
-}
+  .axis path, .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+
+  .brush .extent {
+    fill-opacity: .125;
+    shape-rendering: crispEdges;
+  }
+  svg:nth-of-type(2) {
+    float: right;
+    position: absolute;
+  }
+  .domain {
+    fill: none;
+    stroke: #000;
+    stroke-opacity: .3;
+    stroke-width: 10px;
+    stroke-linecap: round;
+  }
+  .tick {
+    font-size: 10px;
+  }
+  .selecting circle {
+    fill-opacity: .2;
+  }
+  .selecting circle.selected {
+    stroke: #f00;
+  }
+  .handle {
+    fill: #fff;
+    stroke: #000;
+    stroke-opacity: .5;
+    stroke-width: 1.25px;
+    cursor: crosshair;
+  }
 
 
-.axis text {
-  font: 11px sans-serif;
-}
+  .axis text {
+    font: 11px sans-serif;
+  }
 
 
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
+  .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
 
-.grid-background {
-  fill: #ddd;
-}
+  .grid-background {
+    fill: #ddd;
+  }
 
-.grid line,
-.grid path {
-  fill: none;
-  stroke: #fff;
-  shape-rendering: crispEdges;
-}
+  .grid line,
+  .grid path {
+    fill: none;
+    stroke: #fff;
+    shape-rendering: crispEdges;
+  }
 
-.grid .minor.tick line {
-  stroke-opacity: .5;
-}
+  .grid .minor.tick line {
+    stroke-opacity: .5;
+  }
 
-.brush .extent {
-  stroke: #000;
-  fill-opacity: .125;
-  shape-rendering: crispEdges;
-}
+  .brush .extent {
+    stroke: #000;
+    fill-opacity: .125;
+    shape-rendering: crispEdges;
+  }
 
 </style>
 <body>
     <script src="https://d3js.org/d3.v3.min.js"></script>
     <script src='d3-dropdownmenu.js'></script>
-<script>
+    <script>
+    function applyStyling(root) {
+      root.nodes() 
+        .style('border', '1px solid #ddd')
+        .style('padding', '4px 8px')
+        .style('background', '#eee')
+        .style('width', '200px')
+        .on('mouseenter', function() {
+          d3.select(this).transition() // 'this' is a DOM element
+            .style('background', '#ee3')
+        })
+        .on('mouseleave', function() {
+          d3.select(this).transition()
+            .style('background', '#eee')
+        })
 
-var minFreq = 5000;
-var maxFreq = Math.pow(10, 5);
-
-var minTime = 0;
-var maxTime = 24;
-
-var maxSize = 1570;
-var PicThreshold = 80;
-var elementSize = maxSize;
-
-var diameter = 960,
-        format = d3.format(",d"),
-        color = d3.scale.category20();
-
-    var bubble = d3.layout.pack()
-        .sort( function(a, b) 
-        {
-          var threshold = Math.pow(10, 6);
-          if ((a.value > threshold) && (b.value > threshold)) {
-              return -(a.value - b.value);
-          } else {
-              return -1;
+      root.childNodes() // make top level a little different
+        .style('background', '#ccc')
+        .style('width', '75px')
+        .on('mouseenter', function() {
+          d3.select(this).transition()
+            .style('background', '#cc3')
+        })
+        .on('mouseleave', function() {
+          d3.select(this).transition()
+            .style('background', '#ccc')
+        })
+    }
+    </script>
+    <div id='menu'></div>
+    <script>
+      d3.element.dropdownmenu('#menu')
+        .add({
+          'Device' : 
+          {
+            'Canon EOS' : { },
+            'NIKON' : { },
+            'Canon Power Shot' : { },
+            'Apple iPhone' : { },
+            'FUJIFILM FinePix' : { },
+            'OLYMPUS IMAGING' : { },
+            'NIKON COOLPIX' : { },
+            'EASTMAN KODAK' : { },
+            'Canon DIGITAL' : { },
+            'PENTAX' : { },
+          },
+          'Season' : 
+          {
+            'Spring' : null,
+            'Summer' : null,
+            'Autumn' : null,
+            'Fall' : null,
           }
         })
-        .size([diameter, diameter])
-        .padding(1.5);
+        .show() // basic menu has been created
+        // example of tree traversal
+        .firstChildNode() // Option 1
+        .nextSiblingNode() // Option 2
+        .lastChildNode() // 1
+        
+        .root() // get back to the root
+        // and use d3 methods as well
+        .call(applyStyling) // defined in header
+        .call(function(root) {
+          root.childLink().horizontal() // make top level horizontal
+        })
+        .call(function(root) {
+          var option = root.firstChildNode();
+          for (var i = 0; option != null; option = option.firstChildNode()) {
+            option.style('color', '#0' + (i%10) + (i%10));
+            i+=3;
+          }
+        })
+        // center it
+        .call(function(root) {
+          root.style('position', 'relative')
+            .style('left', '50%')
+              .style('margin-left', -parseInt(root.childLink().style('width'))/2 + 'px');
+        })
+    </script>
+<script>
 
-    var svg1 = d3.select("body").append("svg")
-        .attr("width", diameter)
-        .attr("height", diameter
-)        .attr("class", "bubble");
+  var minFreq = 5000;
+  var maxFreq = Math.pow(10, 5);
 
-  var colorScale = d3.scale.linear()
-      .domain([Math.pow(10, 0), 60000])
-      .range(["hsl(255,100%,50%)", "hsl(0,75%,50%)"])
-      .interpolate(d3.interpolateHsl);
+  var minTime = 0;
+  var maxTime = 24;
+
+  var maxSize = 1570;
+  var PicThreshold = 80;
+  var elementSize = maxSize;
+
+  var diameter = 960,
+          format = d3.format(",d"),
+          color = d3.scale.category20();
+
+      var bubble = d3.layout.pack()
+          .sort( function(a, b) 
+          {
+            var threshold = Math.pow(10, 6);
+            if ((a.value > threshold) && (b.value > threshold)) {
+                return -(a.value - b.value);
+            } else {
+                return -1;
+            }
+          })
+          .size([diameter, diameter])
+          .padding(1.5);
+
+      var svg1 = d3.select("body").append("svg")
+          .attr("width", diameter)
+          .attr("height", diameter
+  )        .attr("class", "bubble");
+
+    var colorScale = d3.scale.linear()
+        .domain([Math.pow(10, 0), 60000])
+        .range(["hsl(255,100%,50%)", "hsl(0,75%,50%)"])
+        .interpolate(d3.interpolateHsl);
 
 
-    
-    
-    
+      
+      
+      
 
-function update() {
-      // everytime update() is called, we (re)compute the layout, using the
-      // previously provided value function
-    
-    svg1.selectAll("*").remove();
+  function update() {
+        // everytime update() is called, we (re)compute the layout, using the
+        // previously provided value function
+      
+      svg1.selectAll("*").remove();
 
-    d3.json("FullDataTags", function(error, root) {
-          if (error) throw error;
-        function getRandomInt(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
+      d3.json("FullDataTags", function(error, root) {
+            if (error) throw error;
+          function getRandomInt(min, max) {
+              return Math.floor(Math.random() * (max - min + 1)) + min;
+          }
+      var laidOut = bubble.nodes(classes(root));
+      var counter=0;
+      var node = svg1.selectAll(".node")
+          .data(laidOut
+            .filter(function(d) { //console.log(d);
+              if(!d.children && d.value <= maxFreq && minFreq <= d.value && d.HourOfDay.time >= minTime && d.HourOfDay.time < maxTime) counter++;
+                return !d.children 
+                  && d.value <= maxFreq 
+                  && minFreq <= d.value 
+                  && d.HourOfDay.time >= minTime 
+                  && d.HourOfDay.time < maxTime; 
+              }))
+          //.filter(function(d) { return d.value <= maxFreq && minFreq <= d.value; }))
+          .enter().append("g")
+          .attr("class", "node")
+          .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+      node.append("title")
+          .text(function(d) { return d.className + ": " + format(d.value); });
+    if (counter <= PicThreshold ) 
+    {
+    node.append("pattern")
+      .attr('id', function(d) { return (d.className.replace(/ /g,'')+"-icon");}) // just create a unique id (id comes from the json)
+      .attr('width', 1)
+      .attr('height', 1)
+      .attr('patternContentUnits', 'objectBoundingBox')
+      .append("svg:image")
+        .attr("xlink:xlink:href", function(d) { return (d.url);}) //The double xlink:xlink is a necessary hack (first "xlink:" is lost...).
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("height", 1)
+        .attr("width", 1)
+        .attr("preserveAspectRatio", "xMinYMin slice");
+     }
+     if(counter <= PicThreshold) 
+        {
+          node.append("circle")
+            .attr("r", function(d) { return d.r; })
+          .style("fill", function(d) { return colorScale(d.value); })
+          .style("fill", function(d) { return ("url(#"+d.className.replace(/ /g,'')+"-icon)");})
+        } 
+        else
+        {
+          node.append("circle")
+            .attr("r", function(d) { return d.r; })
+          .style("fill", function(d) { return colorScale(d.value); })
         }
-    var laidOut = bubble.nodes(classes(root));
-    var counter=0;
-    var node = svg1.selectAll(".node")
-        .data(laidOut
-          .filter(function(d) { //console.log(d);
-            if(!d.children && d.value <= maxFreq && minFreq <= d.value && d.HourOfDay.time >= minTime && d.HourOfDay.time < maxTime) counter++;
-              return !d.children 
-                && d.value <= maxFreq 
-                && minFreq <= d.value 
-                && d.HourOfDay.time >= minTime 
-                && d.HourOfDay.time < maxTime; 
-            }))
-        //.filter(function(d) { return d.value <= maxFreq && minFreq <= d.value; }))
-        .enter().append("g")
-        .attr("class", "node")
-        .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
-    node.append("title")
-        .text(function(d) { return d.className + ": " + format(d.value); });
-  if (counter <= PicThreshold ) 
-  {
-  node.append("pattern")
-    .attr('id', function(d) { return (d.className.replace(/ /g,'')+"-icon");}) // just create a unique id (id comes from the json)
-    .attr('width', 1)
-    .attr('height', 1)
-    .attr('patternContentUnits', 'objectBoundingBox')
-    .append("svg:image")
-      .attr("xlink:xlink:href", function(d) { return (d.url);}) //The double xlink:xlink is a necessary hack (first "xlink:" is lost...).
-      .attr("x", 0)
-      .attr("y", 0)
-      .attr("height", 1)
-      .attr("width", 1)
-      .attr("preserveAspectRatio", "xMinYMin slice");
-   }
-   if(counter <= PicThreshold) 
-      {
-        node.append("circle")
-          .attr("r", function(d) { return d.r; })
-        .style("fill", function(d) { return colorScale(d.value); })
-        .style("fill", function(d) { return ("url(#"+d.className.replace(/ /g,'')+"-icon)");})
-      } 
-      else
-      {
-        node.append("circle")
-          .attr("r", function(d) { return d.r; })
-        .style("fill", function(d) { return colorScale(d.value); })
+        node.append("text")
+            .attr("dy", ".3em")
+            .style("text-anchor", "middle")
+            .text(function(d) { return d.className.substring(0, d.r / 3); });
+      });
+
+      // Returns a flattened hierarchy containing all leaf nodes under the root.
+      function classes(root) {
+        var classes = [];
+
+        function recurse(name, node) {
+          if (node.children) node.children.forEach(function(child) { recurse(node.name, child); });
+          else classes.push({packageName: name, className: node.name, value: node.size, url: node.url, 
+          HourOfDay:{"freq": node.HourOfDay.freq, "time": node.HourOfDay["time"]}, 
+          device: {"name": node.device["name"], "num": node.device.num},
+          season: {"name": node.season["name"], "freq": node.season.freq}});
+        }
+
+        recurse(null, root);
+        return {children: classes};
       }
+  }
 
-      node.append("text")
-          .attr("dy", ".3em")
-          .style("text-anchor", "middle")
-          .text(function(d) { return d.className.substring(0, d.r / 3); });
-    });
+      update(); // on initial page loading, use update() to show the visualization
 
-    // Returns a flattened hierarchy containing all leaf nodes under the root.
-    function classes(root) {
-      var classes = [];
+  //frewuency slider
 
-      function recurse(name, node) {
-        if (node.children) node.children.forEach(function(child) { recurse(node.name, child); });
-        else classes.push({packageName: name, className: node.name, value: node.size, url: node.url, 
-        HourOfDay:{"freq": node.HourOfDay.freq, "time": node.HourOfDay["time"]}, 
-        device: {"name": node.device["name"], "num": node.device.num},
-        season: {"name": node.season["name"], "freq": node.season.freq}});
-      }
+  var margin = {top: 194, right: 50, bottom: 214, left: 50},
+      width = 960 - margin.left - margin.right,
+      height = 500 - margin.top - margin.bottom;
 
-      recurse(null, root);
-      return {children: classes};
-    }
-}
+  var x = d3.scale.log()
+      .domain([Math.pow(10, 0), Math.pow(10, 5)])
+      .range([0, width]);
 
-    update(); // on initial page loading, use update() to show the visualization
+  var y = d3.random.normal(height / 4, height / 8);
 
-//frewuency slider
+  var brush = d3.svg.brush()
+      .x(x)
+      .extent([minFreq, maxFreq])
+      .on("brushstart", brushstart)
+      .on("brush", brushmove)
+      .on("brushend", brushend);
 
-var margin = {top: 194, right: 50, bottom: 214, left: 50},
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+  var arc = d3.svg.arc()
+      .outerRadius(height / 4)
+      .startAngle(0)
+      .endAngle(function(d, i) { return i ? -Math.PI : Math.PI; });
 
-var x = d3.scale.log()
-    .domain([Math.pow(10, 0), Math.pow(10, 5)])
-    .range([0, width]);
+  var svg = d3.select("body").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-var y = d3.random.normal(height / 4, height / 8);
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.svg.axis().scale(x).orient("bottom").ticks(20, ",.1s").tickSize(6, 0));
 
-var brush = d3.svg.brush()
-    .x(x)
-    .extent([minFreq, maxFreq])
-    .on("brushstart", brushstart)
-    .on("brush", brushmove)
-    .on("brushend", brushend);
 
-var arc = d3.svg.arc()
-    .outerRadius(height / 4)
-    .startAngle(0)
-    .endAngle(function(d, i) { return i ? -Math.PI : Math.PI; });
+  var brushg = svg.append("g")
+      .attr("class", "brush")
+      .call(brush);
 
-var svg = d3.select("body").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
+  brushg.selectAll(".resize").append("path")
+      .attr("transform", "translate(0," +  height  + ")")
+      .attr("d", arc);
+
+  brushg.selectAll("rect")
+      .attr("transform", "translate(0," +  height *3/4 + ")")
+      .attr("height", height /2);
+
+  brushstart();
+  brushmove();
+
+  function brushstart() {
+    svg.classed("selecting", true);
+  }
+
+  function brushmove() {
+    var s = brush.extent();
+    minFreq = s[0];
+    maxFreq = s[1];
+  }
+
+  function brushend() {
+    svg.classed("selecting", !d3.event.target.empty());
+    update();
+  }
+
+   //date slider
+
+  d3.select(self.frameElement).style("height", diameter + "px");
+
+  var timeMargin = {top: 200, right: 40, bottom: 200, left: 40},
+      timeWidth = 960 - timeMargin.left - timeMargin.right,
+      timeHeight = 500 - timeMargin.top - timeMargin.bottom;
+
+  var timeX = d3.scale.linear()
+      .domain([0,24])
+      .range([0, timeWidth]);
+
+  var timeBrush = d3.svg.brush()
+      .x(timeX)
+      //.extent([0,7])
+      .on("brush", timeBrushed);
+
+  var svg2 = d3.select("body").append("svg")
+      .attr("width", timeWidth + timeMargin.left + timeMargin.right)
+      .attr("height", timeHeight + timeMargin.top + timeMargin.bottom)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      .attr("transform", "translate(" + timeMargin.left + "," + timeMargin.top + ")");
 
-svg.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(d3.svg.axis().scale(x).orient("bottom").ticks(20, ",.1s").tickSize(6, 0));
+  svg2.append("rect")
+      .attr("class", "grid-background")
+      .attr("width", timeWidth)
+      .attr("height", timeHeight);
 
+  svg2.append("g")
+      .attr("class", "x grid")
+      .attr("transform", "translate(0," + timeHeight + ")")
+      .call(d3.svg.axis()
+          .scale(timeX)
+          .orient("bottom")
+          .ticks(24)
+          .tickSize(-timeHeight)
+          .tickFormat(""))
 
-var brushg = svg.append("g")
-    .attr("class", "brush")
-    .call(brush);
-
-brushg.selectAll(".resize").append("path")
-    .attr("transform", "translate(0," +  height  + ")")
-    .attr("d", arc);
-
-brushg.selectAll("rect")
-    .attr("transform", "translate(0," +  height *3/4 + ")")
-    .attr("height", height /2);
-
-brushstart();
-brushmove();
-
-function brushstart() {
-  svg.classed("selecting", true);
-}
-
-function brushmove() {
-  var s = brush.extent();
-  minFreq = s[0];
-  maxFreq = s[1];
-}
-
-function brushend() {
-  svg.classed("selecting", !d3.event.target.empty());
-  update();
-}
-
- //date slider
-
-d3.select(self.frameElement).style("height", diameter + "px");
-
-var timeMargin = {top: 200, right: 40, bottom: 200, left: 40},
-    timeWidth = 960 - timeMargin.left - timeMargin.right,
-    timeHeight = 500 - timeMargin.top - timeMargin.bottom;
-
-var timeX = d3.scale.linear()
-    .domain([0,24])
-    .range([0, timeWidth]);
-
-var timeBrush = d3.svg.brush()
-    .x(timeX)
-    //.extent([0,7])
-    .on("brush", timeBrushed);
-
-var svg2 = d3.select("body").append("svg")
-    .attr("width", timeWidth + timeMargin.left + timeMargin.right)
-    .attr("height", timeHeight + timeMargin.top + timeMargin.bottom)
-  .append("g")
-    .attr("transform", "translate(" + timeMargin.left + "," + timeMargin.top + ")");
-
-svg2.append("rect")
-    .attr("class", "grid-background")
-    .attr("width", timeWidth)
-    .attr("height", timeHeight);
-
-svg2.append("g")
-    .attr("class", "x grid")
-    .attr("transform", "translate(0," + timeHeight + ")")
-    .call(d3.svg.axis()
+  svg2.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + timeHeight + ")")
+      .call(d3.svg.axis()
         .scale(timeX)
         .orient("bottom")
         .ticks(24)
-        .tickSize(-timeHeight)
-        .tickFormat(""))
+        .tickPadding(0))
+    .selectAll("text")
+      .attr("x", 6)
+      .style("text-anchor", null);
 
-svg2.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0," + timeHeight + ")")
-    .call(d3.svg.axis()
-      .scale(timeX)
-      .orient("bottom")
-      .ticks(24)
-      .tickPadding(0))
-  .selectAll("text")
-    .attr("x", 6)
-    .style("text-anchor", null);
+  var gBrush = svg2.append("g")
+      .attr("class", "brush")
+      .call(timeBrush);
 
-var gBrush = svg2.append("g")
-    .attr("class", "brush")
-    .call(timeBrush);
+  gBrush.selectAll("rect")
+      .attr("height", timeHeight);
 
-gBrush.selectAll("rect")
-    .attr("height", timeHeight);
+  function timeBrushed() {
+    var extent0 = timeBrush.extent(),
+        extent1;
 
-function timeBrushed() {
-  var extent0 = timeBrush.extent(),
-      extent1;
-
-  // if dragging, preserve the width of the extent
-  if (d3.event.mode === "move") {
-    var d0 = extent0[0];
-        d1 = extent0[1];
-    extent1 = [Math.round(d0), Math.round(d1)];
-  }
-
-  // otherwise, if resizing, round both dates
-  else {
-    extent1 = extent0.map(Math.round);
-
-    // if empty when rounded, use floor & ceil instead
-    if (extent1[0] >= extent1[1]) {
-      extent1[0] = extent0[0];
-      extent1[1] = extent0[1];
+    // if dragging, preserve the width of the extent
+    if (d3.event.mode === "move") {
+      var d0 = extent0[0];
+          d1 = extent0[1];
+      extent1 = [Math.round(d0), Math.round(d1)];
     }
+
+    // otherwise, if resizing, round both dates
+    else {
+      extent1 = extent0.map(Math.round);
+
+      // if empty when rounded, use floor & ceil instead
+      if (extent1[0] >= extent1[1]) {
+        extent1[0] = extent0[0];
+        extent1[1] = extent0[1];
+      }
+    }
+    //console.log(extent1);
+    minTime = extent1[0];
+    maxTime = extent1[1];
+    d3.select(this).call(timeBrush.extent(extent1));
+    update();
   }
-  //console.log(extent1);
-  minTime = extent1[0];
-  maxTime = extent1[1];
-  d3.select(this).call(timeBrush.extent(extent1));
-  update();
-}
 
 </script>
