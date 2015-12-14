@@ -314,13 +314,6 @@ var timeMargin = {top: 200, right: 40, bottom: 200, left: 40},
 var timeX = d3.scale.linear()
     .domain([0,24])
     .range([0, timeWidth]);
-
-
-
-var svg2 = d3.select("body").append("svg")
-    .attr("width", timeWidth + timeMargin.left + timeMargin.right)
-    .attr("height", timeHeight + timeMargin.top + timeMargin.bottom)
-
 //rect
 var slidercontainer=svg.append("g")
     .attr("transform", "translate(0,0)");
