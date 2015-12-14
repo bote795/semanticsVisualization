@@ -446,7 +446,7 @@ function update() {
   //node *** transition stuff
   if(counter <= PicThreshold) 
   {
-    node.append("pattern")
+   node.select("pattern")
       .attr('id', function(d) { return (d.className.replace(/ /g,'')+"-icon");}) // just create a unique id (id comes from the json)
       .attr('width', 1)
       .attr('height', 1)
@@ -471,7 +471,15 @@ function update() {
       .attr("r", function(d) { return d.r; })
       .style("fill", colorCircle)
   }
-
+  node.select("title")
+    .text(function(d) { return d.className + ": " + format(d.value); });
+  node.select("text")
+      .attr("class","strokeme")
+      .attr("dy", ".3em")
+      .style("text-anchor", "middle")
+      .style("font-family","Arial")
+      .style("fill","white")
+      .text(function(d) { return d.className.substring(0, d.r / 3); });
   node.transition().attr("class", "node")
     .attr("transform", function (d) {
         return "translate(" + d.x + "," + d.y + ")";
