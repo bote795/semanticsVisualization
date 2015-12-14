@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
-
+*{
+  background-color: #004c4d;
+}
 text {
-  font: 10px sans-serif;
+  font: 10px Arial;
 }
 
 svg {
-  font: 10px sans-serif;
+  font: 10px Arial;
 }
 
 circle {
@@ -211,6 +213,8 @@ function update() {
       node.append("text")
           .attr("dy", ".3em")
           .style("text-anchor", "middle")
+          .style("fill", 'white')
+          .style("font-family","Arial")
           .text(function(d) { return d.className.substring(0, d.r / 3); });
     });
 
