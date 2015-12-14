@@ -425,17 +425,41 @@ function update() {
   nodeEnter.append("text")
       .attr("dy", ".3em")
       .style("text-anchor", "middle")
+      .style("font-family","Arial")
       .text(function(d) { return d.className.substring(0, d.r / 3); });
-  //node ***
-   node.select("circle")
-        .transition().duration(1000)
-        .attr("r", function(d) { return d.r; })
-        .style("fill", colorCircle)
+  //node *** transition stuff
+  if(counter <= PicThreshold) 
+  {
+    node.append("pattern")
+      .attr('id', function(d) { return (d.className.replace(/ /g,'')+"-icon");}) // just create a unique id (id comes from the json)
+      .attr('width', 1)
+      .attr('height', 1)
+      .attr('patternContentUnits', 'objectBoundingBox')
+      .append("svg:image")
+        .attr("xlink:xlink:href", function(d) { return (d.url);}) //The double xlink:xlink is a necessary hack (first "xlink:" is lost...).
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("height", 1)
+        .attr("width", 1)
+        .attr("preserveAspectRatio", "xMinYMin slice");
+    node.select("circle")
+      .transition().duration(1000)
+      .attr("r", function(d) { return d.r; })
+      .style("fill", colorCircle)
+      .style("fill", function(d) { return ("url(#"+d.className.replace(/ /g,'')+"-icon)");})
+  } 
+  else
+  {
+    node.select("circle")
+      .transition().duration(1000)
+      .attr("r", function(d) { return d.r; })
+      .style("fill", colorCircle)
+  }
 
-      node.transition().attr("class", "node")
-        .attr("transform", function (d) {
-            return "translate(" + d.x + "," + d.y + ")";
-        });
+  node.transition().attr("class", "node")
+    .attr("transform", function (d) {
+        return "translate(" + d.x + "," + d.y + ")";
+    });
   node.exit().remove();
 
   }); // close data load
