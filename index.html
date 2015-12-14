@@ -3,7 +3,7 @@
 <style>
 
   text {
-    font: 10px sans-serif;
+    font: 14px sans-serif;
   }
 
   body {
@@ -13,7 +13,7 @@
   }
 
   svg {
-    font: 12px sans-serif;
+    font: 10px sans-serif;
   }
 
   circle {
@@ -116,6 +116,7 @@
     
 }
 </style>
+<head> Flickr Tag Frequencies </head>
 <body>
     <script src="https://d3js.org/d3.v3.min.js"></script>
     <script src='d3-dropdownmenu.js'></script>
@@ -276,7 +277,7 @@
         .call(function(root) {
           root.style('position', 'relative')
             .style('left', '50%')
-              .style('margin-left', -parseInt(root.childLink().style('width'))/2 + 'px');
+              .style('margin-left', -parseInt(root.childLink().style('width')) + 'px');
         })
       
 function colorCircle(d) 
@@ -655,3 +656,6 @@ var slidercontainer=svg.append("g")
   }
 
 </script>
+
+<div><a href="about.html">about</a></div>
+</body>
