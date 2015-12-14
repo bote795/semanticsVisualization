@@ -193,9 +193,14 @@
           .attr("height", diameter
   )        .attr("class", "bubble");
 
-    var colorScale = d3.scale.linear()
-        .domain([Math.pow(10, 0), 60000])
-        .range(["hsl(255,100%,50%)", "hsl(0,75%,50%)"])
+    var colorScale1 = d3.scale.log()
+        .domain([Math.pow(10, 3), 60000])
+        .range(["hsl(120, 100%, 50%)", "hsl(0,75%,50%)"])
+        .interpolate(d3.interpolateHsl);
+
+    var colorScale2 = d3.scale.linear()
+        .domain([Math.pow(10, 0), Math.pow(10, 3)])
+        .range(["hsl(255,100%,50%)", "hsl(120, 100%, 50%)"])
         .interpolate(d3.interpolateHsl);
 
       function test() {
@@ -322,14 +327,32 @@
         {
           node.append("circle")
             .attr("r", function(d) { return d.r; })
-          .style("fill", function(d) { return colorScale(d.value); })
+          .style("fill", function(d) 
+            { 
+              if (d.value > 1000 ) 
+                {
+                  return colorScale1(d.value); 
+                }
+              else {
+                return colorScale2(d.value);
+              } 
+              })
           .style("fill", function(d) { return ("url(#"+d.className.replace(/ /g,'')+"-icon)");})
         } 
         else
         {
           node.append("circle")
             .attr("r", function(d) { return d.r; })
-          .style("fill", function(d) { return colorScale(d.value); })
+          .style("fill", function(d) 
+            { 
+              if (d.value > 1000 ) 
+                {
+                  return colorScale1(d.value); 
+                }
+              else {
+                return colorScale2(d.value);
+              } 
+              })
         }
 
         node.append("text")
