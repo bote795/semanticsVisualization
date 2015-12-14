@@ -139,62 +139,33 @@
     </script>
     <div id='menu'></div>
     <script>
-      d3.element.dropdownmenu('#menu')
-        .add({
-          'Device' : 
-          {
-            'Canon EOS' : { },
-            'NIKON' : { },
-            'Canon Power Shot' : { },
-            'Apple iPhone' : { },
-            'FUJIFILM FinePix' : { },
-            'OLYMPUS IMAGING' : { },
-            'NIKON COOLPIX' : { },
-            'EASTMAN KODAK' : { },
-            'Canon DIGITAL' : { },
-            'PENTAX' : { },
-          },
-          'Season' : 
-          {
-            'Spring' : null,
-            'Summer' : null,
-            'Autumn' : null,
-            'Fall' : null,
-          }
-        })
-        .show() // basic menu has been created
-        // example of tree traversal
-        .firstChildNode() // Option 1
-        .nextSiblingNode() // Option 2
-        .lastChildNode() // 1
-        
-        .root() // get back to the root
-        // and use d3 methods as well
-        .call(applyStyling) // defined in header
-        .call(function(root) {
-          root.childLink().horizontal() // make top level horizontal
-        })
-        .call(function(root) {
-          var option = root.firstChildNode();
-          for (var i = 0; option != null; option = option.firstChildNode()) {
-            option.style('color', '#0' + (i%10) + (i%10));
-            i+=3;
-          }
-        })
-        // center it
-        .call(function(root) {
-          root.style('position', 'relative')
-            .style('left', '50%')
-              .style('margin-left', -parseInt(root.childLink().style('width'))/2 + 'px');
-        })
-    </script>
-<script>
+      
 
   var minFreq = 5000;
   var maxFreq = Math.pow(10, 5);
 
   var minTime = 0;
   var maxTime = 24;
+
+  var anyChoice = "all";
+  var Spring = "Spring";
+  var Summer = "Summer";
+  var Autumn = "Autumn";
+  var Winter = "Winter";
+
+  var dev1 = "Canon EOS";
+  var dev2 = "NIKON CORPORATION";
+  var dev3 = "Canon PowerShot";
+  var dev4 = "Apple iPhone";
+  var dev5 = "FUJIFILM FinePix";
+  var dev6 = "OLYMPUS IMAGING";
+  var dev7 = "NIKON COOLPIX";
+  var dev8 = "EASTMAN KODAK";
+  var dev9 = "Canon DIGITAL";
+  var dev0 = "PENTAX Corporation";
+
+  var deviceChosen = "all";
+  var seasonChosen = "all";
 
   var maxSize = 1570;
   var PicThreshold = 80;
@@ -227,9 +198,70 @@
         .range(["hsl(255,100%,50%)", "hsl(0,75%,50%)"])
         .interpolate(d3.interpolateHsl);
 
+      function test() {
+        console.log("HALLO POPPET");
+      }
 
+      function changeDevice(device) {
+        deviceChosen = device;
+        update();
+      }
+
+      function changeSeason(season) {
+        seasonChosen = season;
+        update();
+      }
       
-      
+      d3.element.dropdownmenu('#menu')
+        .add({
+          'Device' : 
+          {
+            '<a href="#" onclick="javascript:changeDevice(anyChoice);"> All </a>' : null,
+            '<a href="#" onclick="javascript:changeDevice(dev1);"> Canon EOS </a>' : null,
+            '<a href="#" onclick="javascript:changeDevice(dev2);"> NIKON CORPORATION </a>' : null,
+            '<a href="#" onclick="javascript:changeDevice(dev3);"> Canon PowerShot </a>' : null,
+            '<a href="#" onclick="javascript:changeDevice(dev4);"> Apple iPhone </a>' : null,
+            '<a href="#" onclick="javascript:changeDevice(dev5);"> FUJIFILM FinePix </a>' : null,
+            '<a href="#" onclick="javascript:changeDevice(dev6);"> OLYMPUS IMAGING </a>' : null,
+            '<a href="#" onclick="javascript:changeDevice(dev7);"> NIKON COOLPIX </a>' : null,
+            '<a href="#" onclick="javascript:changeDevice(dev8);"> EASTMAN KODAK </a>' : null,
+            '<a href="#" onclick="javascript:changeDevice(dev9);"> Canon DIGITAL </a>' : null,
+            '<a href="#" onclick="javascript:changeDevice(dev0);"> PENTAX Corporation </a>' : null,
+          },
+          'Season' : 
+          {
+            '<a href="#" onclick="javascript:changeSeason(anyChoice);"> All </a>' : null,
+            '<a href="#" onclick="javascript:changeSeason(Spring);"> Spring </a>' : null,
+            '<a href="#" onclick="javascript:changeSeason(Summer);"> Summer </a>' : null,
+            '<a href="#" onclick="javascript:changeSeason(Autumn);"> Autumn </a>' : null,
+            '<a href="#" onclick="javascript:changeSeason(Winter);"> Winter </a>' : null,
+          }
+        })
+        .show() // basic menu has been created
+        // example of tree traversal
+        .firstChildNode() // Option 1
+        .nextSiblingNode() // Option 2
+        .lastChildNode() // 1
+        
+        .root() // get back to the root
+        // and use d3 methods as well
+        .call(applyStyling) // defined in header
+        .call(function(root) {
+          root.childLink().horizontal() // make top level horizontal
+        })
+        .call(function(root) {
+          var option = root.firstChildNode();
+          for (var i = 0; option != null; option = option.firstChildNode()) {
+            option.style('color', '#0' + (i%10) + (i%10));
+            i+=3;
+          }
+        })
+        // center it
+        .call(function(root) {
+          root.style('position', 'relative')
+            .style('left', '50%')
+              .style('margin-left', -parseInt(root.childLink().style('width'))/2 + 'px');
+        })
       
 
   function update() {
@@ -248,12 +280,21 @@
       var node = svg1.selectAll(".node")
           .data(laidOut
             .filter(function(d) { //console.log(d);
-              if(!d.children && d.value <= maxFreq && minFreq <= d.value && d.HourOfDay.time >= minTime && d.HourOfDay.time < maxTime) counter++;
+              if(!d.children 
+                  && d.value <= maxFreq 
+                  && minFreq <= d.value 
+                  && d.HourOfDay.time >= minTime 
+                  && d.HourOfDay.time < maxTime
+                  && (d.season["name"] == seasonChosen || seasonChosen == "all")
+                  && (d.device["name"] == deviceChosen || deviceChosen == "all")
+                  ) counter++;
                 return !d.children 
                   && d.value <= maxFreq 
                   && minFreq <= d.value 
                   && d.HourOfDay.time >= minTime 
-                  && d.HourOfDay.time < maxTime; 
+                  && d.HourOfDay.time < maxTime
+                  && (d.season["name"] == seasonChosen || seasonChosen == "all")
+                  && (d.device["name"] == deviceChosen || deviceChosen == "all"); 
               }))
           //.filter(function(d) { return d.value <= maxFreq && minFreq <= d.value; }))
           .enter().append("g")
