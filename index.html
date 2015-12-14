@@ -103,7 +103,16 @@
     fill-opacity: .125;
     shape-rendering: crispEdges;
   }
-
+.strokeme
+{
+    color: white;
+    text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+    
+}
 </style>
 <body>
     <script src="https://d3js.org/d3.v3.min.js"></script>
@@ -342,7 +351,9 @@ function colorCircle(d)
 
   node.append("text")
       .attr("dy", ".3em")
+      .attr("class","strokeme")
       .style("text-anchor", "middle")
+      .style("fill", "white")
       .text(function(d) { return d.className.substring(0, d.r / 3); });
   }); // close data load
 
@@ -423,9 +434,11 @@ function update() {
   }
 
   nodeEnter.append("text")
+      .attr("class","strokeme")
       .attr("dy", ".3em")
       .style("text-anchor", "middle")
       .style("font-family","Arial")
+      .style("fill","white")
       .text(function(d) { return d.className.substring(0, d.r / 3); });
   //node *** transition stuff
   if(counter <= PicThreshold) 
@@ -563,12 +576,6 @@ update(); // on initial page loading, use update() to show the visualization
       .x(timeX)
       //.extent([0,7])
       .on("brush", timeBrushed);
-
-  var svg2 = d3.select("body").append("svg")
-      .attr("width", timeWidth + timeMargin.left + timeMargin.right)
-      .attr("height", timeHeight + timeMargin.top + timeMargin.bottom)
-    .append("g")
-      .attr("transform", "translate(" + timeMargin.left + "," + timeMargin.top + ")");
 //rect
 var slidercontainer=svg.append("g")
     .attr("transform", "translate(0,0)");
